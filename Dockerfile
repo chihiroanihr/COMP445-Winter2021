@@ -22,4 +22,4 @@ USER appuser
 EXPOSE 8007
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "timeserver.py"]
+CMD ["python", "echoserver.py"]

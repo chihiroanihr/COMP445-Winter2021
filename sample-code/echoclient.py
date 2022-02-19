@@ -11,6 +11,7 @@ def run_client(host, port):
         while True:
             line = sys.stdin.readline(1024)
             request = line.encode("utf-8")
+            # call get_request
             conn.sendall(request)
             # MSG_WAITALL waits for full request or error
             response = conn.recv(len(request), socket.MSG_WAITALL)

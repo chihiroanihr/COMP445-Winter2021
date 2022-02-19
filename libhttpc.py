@@ -1,0 +1,155 @@
+from email import header
+import socket
+import sys
+from urllib.parse import urlparse
+
+# 1. HTTP client initiates TCP connection to HTTP server (process) at {link} on port {num}
+# 1s. HTTP server at host {link} waiting for TCP connection at port {num}
+#   --> Accepts connection, notifying client
+
+# 2. HTTP client sends HTTP request message containing URL into TCP connection socket
+#   (Up to here is TCP handshake)
+# 2s. HTTP server receives request message, forms response message containing requested object,
+#   and sends message into its socket
+# 3s. HTTP server closes TCP connection
+# 3. HTTP client receives response message containing html file, displays html. 
+#   --> Parses html file, finds more objects --> REQUEST AGAIN
+
+class HttpcRequests:
+
+    def __init__(self, url, headers={}, body='', verbose=False, DEFAULT_PORT=80): # Standard HTTP/TCP port is 80
+        self.request_method = None  # To initialize request method: GET / POST
+        self.request_message = ''   # To send full request lines to the host
+        self.parsed_url = urlparse(url) # Parse URL
+        self.hostname = self.parsed_url.hostname
+        self.path = self.parsed_url.path if self.parsed_url.path else '/'
+        # if port num not specified in url, use default port
+        self.port = self.parsed_url.port if self.parsed_url.port else DEFAULT_PORT
+        self.query = self.parsed_url.query  # in string
+        self.headers = headers  # in dict {'key':'val'}
+        self.body = body
+        self.verbose = verbose
+
+        #self.scheme = self.parsed_url.scheme
+        #self.netloc = self.parsed_url.netloc
+        #self.params = self.parsed_url.params
+        #self.fragment = self.parsed_url.fragment
+
+
+    def create_request_headers(self):
+        DEFAULT_USER_AGENT = 'Concordia-HTTP/1.0'
+
+        # add host entry to the headers dict
+        self.headers['Host'] = self.hostname
+
+        # if User-Agent header does not exist (user did not specified in httpc command line with -h)
+        if 'User-Agent' not in self.headers:
+            self.headers['User-Agent'] = DEFAULT_USER_AGENT # then append default user-agent
+
+        if self.request_method == 'POST' and self.body:
+            self.headers['Content-Length'] = str(len(self.body))
+
+        ''' self.headers['Connection'] = 'closed' '''
+
+        request_header_str = ''
+        for key, val in self.headers.items():
+            request_header_str += '{}:{}\r\n'.format(key, val)
+        return request_header_str
+
+    
+    def create_request_body(self):
+        request_body_str = '{}'.format(self.body)
+        return request_body_str
+
+
+    def run_client(self):
+        # open and set up client socket
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            # connect to the server(host) at port num given
+            client_socket.connect((self.hostname, self.port))
+            # send request message to server
+            client_socket.sendall(self.request_message.encode("UTF-8"))
+            # receive response data from server
+            # MSG_WAITALL waits for full request or error
+            response = client_socket.recv(4096, socket.MSG_WAITALL).decode("utf-8")
+
+            # if no verbose, remove all the response headers (until CRLF)
+            if not self.verbose:
+                response = response[response.find('\r\n\r\n'):].replace('\r\n\r\n', '')
+            
+            print("[Replied]")
+            sys.stdout.write(response)
+
+        finally:
+            # close the connection
+            client_socket.close()
+
+
+    def GET(self):
+        self.request_method = 'GET'
+
+        # Request-URI = [ path ][ "?" query ]
+        request_uri = "{}?{}".format(self.path, self.query) if self.query else self.path
+        # Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+        request_line = "GET {} HTTP/1.0\r\n".format(request_uri)
+        # Request-Heaer = Headers CRLF User-Agent CRLF
+        request_headers = self.create_request_headers()
+        self.request_message = "{}{}\r\n".format(request_line, request_headers)
+
+        print("[Sent]")
+        print(self.request_message)
+
+        self.run_client()
+        #return self.request_message
+
+
+    def POST(self):
+        self.request_method = 'POST'
+
+        # Request-URI = [ path ][ "?" query ]
+        request_uri = "{}?{}".format(self.path, self.query) if self.query else self.path
+        # Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+        request_line = "POST {} HTTP/1.0\r\n".format(request_uri)
+        # Request-Heaer = Headers CRLF User-Agent CRLF
+        request_headers = self.create_request_headers()
+        # Request-Body
+        request_body = self.create_request_body()
+
+        self.request_message = "{}{}\r\n{}\r\n\r\n".format(request_line, request_headers, request_body)
+
+        print("[Sent]")
+        print(self.request_message)
+
+        self.run_client()
+        #return self.request_message
+
+
+if __name__ == "__main__":
+    print("========= 1st Request =========")
+    request = HttpcRequests('http://httpbin.org/status/418')
+    request.GET()
+    request.POST()
+
+    print("========= 2nd Request =========")
+    url = 'http://httpbin.org/status/418'
+    headers = {'key':'value'}
+    request = HttpcRequests(url, headers=headers)
+    request.GET()
+
+    print("========= 3rd Request =========")
+    request = HttpcRequests(url, headers=headers, verbose=True)
+    request.GET()
+
+    print("========= 4th Request =========")
+    url = 'http://httpbin.org/get?course=networking&assignment=1'
+    headers = {'key1':'value1'}
+    request = HttpcRequests(url, headers=headers)
+    request.GET()
+
+    print("========= 5th Request =========")
+    url = 'http://httpbin.org/post'
+    data = "{'Assignment': 1}"
+    headers = {"Content-Type":"application/json"}
+    request = HttpcRequests(url, headers=headers, body=data)
+    request.POST()

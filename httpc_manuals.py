@@ -29,20 +29,21 @@ class HttpcManuals:
     H_HELP = '''Associates headers to HTTP Request with the format 'key:value'.'''
     D_HELP = '''Associates an inline data to the body HTTP POST request.'''
     F_HELP = '''Associates the content of a file to the body HTTP POST request.'''
+    O_HELP = '''Returns the body of the response to the specified file instead of the console.'''
 
     GET_HELP = "Get executes a HTTP GET reqeust for a given URL."
     POST_HELP = "Post executes a HTTP POST request for a given URL with inline data or form file."
     POST_EPILOG = "Either [-d] or [-f] can be used but not both."
 
 
-    GET_HELP_CUSTOM = "Usage: httpc get [-v] [-h key:value] URL \
+    GET_HELP_CUSTOM = "Usage: httpc get [-v] [-h key:value] URL [-o output-file] FILENAME \
     \n \
     \nGet executes a HTTP GET reqeust for a given URL. \
     \n  -v              {} \
     \n  -h key:value    {} \
     ".format(V_HELP, H_HELP)
 
-    POST_HELP_CUSTOM = "Usage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL \
+    POST_HELP_CUSTOM = "Usage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL [-o output-file] FILENAME\
     \n \
     \nPost executes a HTTP POST request for a given URL with inline data or form file. \
     \n  -v              {} \

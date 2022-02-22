@@ -2,6 +2,7 @@ from email import header
 import socket
 import sys
 from urllib.parse import urlparse
+import json
 
 # 1. HTTP client initiates TCP connection to HTTP server (process) at {link} on port {num}
 # 1s. HTTP server at host {link} waiting for TCP connection at port {num}
@@ -17,7 +18,7 @@ from urllib.parse import urlparse
 
 class HttpcRequests:
 
-    def __init__(self, url, headers={}, body='', verbose=False, DEFAULT_PORT=80): # Standard HTTP/TCP port is 80
+    def __init__(self, url, headers='', inline_body='', file='', verbose=False, output_file='', DEFAULT_PORT=80): # Standard HTTP/TCP port is 80
         self.request_method = None  # To initialize request method: GET / POST
         self.request_message = ''   # To send full request lines to the host
         self.parsed_url = urlparse(url) # Parse URL
@@ -27,8 +28,11 @@ class HttpcRequests:
         self.port = self.parsed_url.port if self.parsed_url.port else DEFAULT_PORT
         self.query = self.parsed_url.query  # in string
         self.headers = headers  # in dict {'key':'val'}
-        self.body = body
+        self.inline_body = inline_body
+        self.file = file
         self.verbose = verbose
+        self.body = ''
+        self.output_file = output_file
 
         #self.scheme = self.parsed_url.scheme
         #self.netloc = self.parsed_url.netloc
@@ -40,13 +44,15 @@ class HttpcRequests:
         DEFAULT_USER_AGENT = 'Concordia-HTTP/1.0'
 
         # add host entry to the headers dict
+        if not self.headers:
+            self.headers = dict()
         self.headers['Host'] = self.hostname
 
         # if User-Agent header does not exist (user did not specified in httpc command line with -h)
         if 'User-Agent' not in self.headers:
             self.headers['User-Agent'] = DEFAULT_USER_AGENT # then append default user-agent
-
-        if self.request_method == 'POST' and self.body:
+            
+        if self.body:
             self.headers['Content-Length'] = str(len(self.body))
 
         ''' self.headers['Connection'] = 'closed' '''
@@ -58,8 +64,27 @@ class HttpcRequests:
 
     
     def create_request_body(self):
-        request_body_str = '{}'.format(self.body)
-        return request_body_str
+        if self.file:
+            with open(self.file, encoding='utf-8') as json_file:
+                json_data = json.load(json_file)
+                self.body=json.dumps(json_data)
+        if self.inline_body:
+            self.body = str(self.inline_body)
+        return self.body
+        #return request_body_str
+        #return self.inline_body
+        
+    
+    def output_to_file(self, response):
+        try:
+            f = open(self.output_file, "w")
+            print("The response was written in the {} file.".format(self.output_file))
+            f.write(response)
+        except:
+            print("The error occured while outputting to file.")
+            print(response)
+        finally:
+            f.close()
 
 
     def run_client(self):
@@ -78,8 +103,11 @@ class HttpcRequests:
             if not self.verbose:
                 response = response[response.find('\r\n\r\n'):].replace('\r\n\r\n', '')
             
-            print("[Replied]")
-            sys.stdout.write(response)
+            if self.output_file:
+                self.output_to_file(response)
+            else:
+                print("[Replied]")
+                sys.stdout.write(response)
 
         finally:
             # close the connection
@@ -111,10 +139,10 @@ class HttpcRequests:
         request_uri = "{}?{}".format(self.path, self.query) if self.query else self.path
         # Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         request_line = "POST {} HTTP/1.0\r\n".format(request_uri)
-        # Request-Heaer = Headers CRLF User-Agent CRLF
-        request_headers = self.create_request_headers()
         # Request-Body
         request_body = self.create_request_body()
+        # Request-Heaer = Headers CRLF User-Agent CRLF
+        request_headers = self.create_request_headers()
 
         self.request_message = "{}{}\r\n{}\r\n\r\n".format(request_line, request_headers, request_body)
 
@@ -127,10 +155,10 @@ class HttpcRequests:
 
 if __name__ == "__main__":
     print("========= 1st Request =========")
-    request = HttpcRequests('http://httpbin.org/status/418')
+    url = 'http://httpbin.org/status/418'
+    request = HttpcRequests(url)
     request.GET()
-    request.POST()
-
+    
     print("========= 2nd Request =========")
     url = 'http://httpbin.org/status/418'
     headers = {'key':'value'}
@@ -151,5 +179,17 @@ if __name__ == "__main__":
     url = 'http://httpbin.org/post'
     data = "{'Assignment': 1}"
     headers = {"Content-Type":"application/json"}
-    request = HttpcRequests(url, headers=headers, body=data)
+    request = HttpcRequests(url, headers=headers, inline_body=data)
+    request.POST()
+    
+    print("========= 6th Request =========")
+    url = 'http://httpbin.org/post'    
+    headers = {"Content-Type":"application/json"}
+    request = HttpcRequests(url=url, headers=headers, file='file1.json')
+    request.POST()
+    
+    print("========= 7th Request =========")
+    url = 'http://httpbin.org/post'    
+    headers = {"Content-Type":"application/json"}
+    request = HttpcRequests(url=url, headers=headers, file='file1.json', output_file='result.txt')
     request.POST()

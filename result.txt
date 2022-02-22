@@ -1,0 +1,35 @@
+{
+  "args": {}, 
+  "data": "{\"id\": 99999999, \"orders\": [{\"ID\": 8383838383, \"amount\": 0, \"slotID\": 36972026}, {\"ID\": 2929292929, \"amount\": 0, \"slotID\": 36972026}, {\"ID\": 4747474747, \"amount\": 0, \"slotID\": 36972026}]}", 
+  "files": {}, 
+  "form": {}, 
+  "headers": {
+    "Content-Length": "187", 
+    "Content-Type": "application/json", 
+    "Host": "httpbin.org", 
+    "User-Agent": "Concordia-HTTP/1.0", 
+    "X-Amzn-Trace-Id": "Root=1-621576f5-13fa7137797655cb7ad0e52c"
+  }, 
+  "json": {
+    "id": 99999999, 
+    "orders": [
+      {
+        "ID": 8383838383, 
+        "amount": 0, 
+        "slotID": 36972026
+      }, 
+      {
+        "ID": 2929292929, 
+        "amount": 0, 
+        "slotID": 36972026
+      }, 
+      {
+        "ID": 4747474747, 
+        "amount": 0, 
+        "slotID": 36972026
+      }
+    ]
+  }, 
+  "origin": "96.21.186.165", 
+  "url": "http://httpbin.org/post"
+}

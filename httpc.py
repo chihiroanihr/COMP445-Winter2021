@@ -53,7 +53,7 @@ class HTTPC:
         parser = argparse.ArgumentParser(prog='httpc', conflict_handler='resolve', usage=argparse.SUPPRESS, description=HttpcManuals.GET_HELP, formatter_class=rtf)
         parser.add_argument('-v', '--verbose', action='store_true', help=HttpcManuals.V_HELP)
         parser.add_argument('-h', '--headers', action='append', metavar='key:value', default=[], help=HttpcManuals.H_HELP)
-        parser.add_argument('URL', default='www.python.org', help='server host')
+        parser.add_argument('URL', help='server host')
         parser.add_argument('-o', '--output', help=HttpcManuals.O_HELP)
         args = parser.parse_args(sys.argv[2:])
 
@@ -75,9 +75,9 @@ class HTTPC:
         parser = argparse.ArgumentParser(prog='httpc', conflict_handler='resolve', usage=argparse.SUPPRESS, description=HttpcManuals.POST_HELP, epilog=HttpcManuals.POST_EPILOG, formatter_class=rtf)
         parser.add_argument('-v', '--verbose', action='store_true', help=HttpcManuals.V_HELP)
         parser.add_argument('-h', '--headers', action='append', metavar='key:value', default=[], help=HttpcManuals.H_HELP)
-        parser.add_argument('-d', '--inline-data', metavar='string', type=str, help=HttpcManuals.D_HELP, dest='inline_data')
+        parser.add_argument('-d', '--inline-data', metavar='string', help=HttpcManuals.D_HELP, dest='inline_data')
         parser.add_argument('-f', '--file', help=HttpcManuals.F_HELP, dest='file')
-        parser.add_argument('URL', default='http://httpbin.org', help='server host')
+        parser.add_argument('URL', help='server host')
         parser.add_argument('-o', '--output', help=HttpcManuals.O_HELP)
         args = parser.parse_args(sys.argv[2:])
         
@@ -86,10 +86,16 @@ class HTTPC:
         self.verbose = args.verbose
         self.inline_data = args.inline_data
         self.file = args.file
-        self.file_is_valid(self.file)   # validate file
+        
+        # Convert string headers into dict if exists
+        if self.headers:
+            self.convert_headers_to_dict()
+        
+        if self.file:
+            self.file_is_valid(self.file)   # validate file
         self.output_file = args.output
         
-        if self.inline_data and self.file:
+        if self.inline_data and self.file:  # both -d and -v cannot be used
             print("-d and -f cannot be used together")
             sys.exit(1)
             

@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
     print("========= 5th Request =========")
     url = 'http://httpbin.org/post'
-    data = "{'Assignment': 1}"
+    data = {'Assignment': 1}
     headers = {"Content-Type":"application/json"}
     request = HttpcRequests(url, headers=headers, inline_body=data)
     request.POST()

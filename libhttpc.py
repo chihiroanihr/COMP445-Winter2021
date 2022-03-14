@@ -75,6 +75,7 @@ class HttpcRequests:
         
     
     def output_to_file(self, response):
+        self.output_file = './outputs/' + self.output_file
         try:
             f = open(self.output_file, "w")
             print("The response was written in the {} file.".format(self.output_file))

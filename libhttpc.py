@@ -1,4 +1,3 @@
-from email import header
 import socket
 import sys
 from urllib.parse import urlparse

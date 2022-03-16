@@ -1,7 +1,7 @@
 import argparse
 from argparse import RawTextHelpFormatter as rtf
 import sys
-from httpc_manuals import HttpcManuals
+from console_messages import HttpcManuals
 from libhttpc import HttpcRequests
 
 #print(HttpcManuals.LOGO)
@@ -21,7 +21,7 @@ class HTTPC:
         parser.add_argument('command')
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
-            print('httpc: error: unrecognized arguments:', args.command)
+            print('httpc error: unrecognized arguments:', args.command)
             print()
             parser.print_help()
         else:   # use dispatch pattern to invoke method with same name
@@ -37,13 +37,13 @@ class HTTPC:
         try:
             f = open(file, 'rb')
         except FileNotFoundError:
-            print(f"File {file} not found.  Aborting")
+            print("File {file} not found.  Aborting")
             sys.exit(1)
         except OSError:
-            print(f"OS error occurred trying to open {file}")
+            print("OS error occurred trying to open {file}")
             sys.exit(1)
         except Exception as err:
-            print(f"Unexpected error opening {file} is",repr(err))
+            print("Unexpected error opening {file} is",repr(err))
             sys.exit(1)
         else:
             return True
@@ -116,7 +116,7 @@ class HTTPC:
         elif args.command == 'post':
             print(HttpcManuals.POST_HELP_CUSTOM)
         else:
-            print('httpc: error: unrecognized arguments:', args.command)
+            print('httpc error: unrecognized arguments:', args.command)
             print()
             parser.print_help()
 

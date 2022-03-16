@@ -35,7 +35,6 @@ class HttpcManuals:
     POST_HELP = "Post executes a HTTP POST request for a given URL with inline data or form file."
     POST_EPILOG = "Either [-d] or [-f] can be used but not both."
 
-
     GET_HELP_CUSTOM = "Usage: httpc get [-v] [-h key:value] URL [-o output-file] FILENAME \
     \n \
     \nGet executes a HTTP GET reqeust for a given URL. \
@@ -55,6 +54,22 @@ class HttpcManuals:
     ".format(V_HELP, H_HELP, D_HELP, F_HELP)
 
 
+class HttpfsManuals:
+
+    V_HELP = '''Prints debugging messages.'''
+    P_HELP = '''Specifies the port number that the server will listen and serve at. \
+    \n      Default is 8080.'''
+    D_HELP = '''Associates an inline data to the body HTTP POST request.'''
+
+    HELP = "httpfc is a simple file server. \
+    \nUsage: httpfc [-v] [-p PORT] [-d PATH-TO-DIR] \
+    \n  -v\t{} \
+    \n  -p\t{} \
+    \n  -d\t{} \
+    ".format(V_HELP, P_HELP, D_HELP)
+
+
+
 if __name__ == '__main__':
     print(HttpcManuals.LOGO)
     print(HttpcManuals.WELCOME)
@@ -68,3 +83,5 @@ if __name__ == '__main__':
     print(HttpcManuals.GET_HELP_CUSTOM)
     print()
     print(HttpcManuals.POST_HELP_CUSTOM)
+    print()
+    print(HttpfsManuals.HELP)

@@ -21,7 +21,36 @@ class HTTPFS:
 
         run_server('', self.port, self.directory, self.verbose)
 
+
+
 if __name__ == '__main__':
     args = HTTPFS()
-    print(args.verbose, args.port, args.directory)
-    print()
+
+''' default '''
+# python3 httpfs.py
+
+# [output]
+# * * * * * Server is listening at 8007 * * * * *
+
+''' verbose '''
+# python3 httpfs.py -v
+
+# [output]
+# * * * * * Server is listening at 8007 * * * * *
+# Default server folder: 'server/default' was assigned.
+
+''' verbose, port number '''
+# python3 httpfs.py -v -p 8070
+
+# [output]
+# * * * * * Server is listening at 8007 * * * * *
+# Default server folder: 'server/default' was assigned.
+
+''' server folder '''
+# python3 httpfs.py -d foo
+# python3 httpfs.py -d /foo
+
+# [output]
+# * * * * * Server is listening at 8007 * * * * *
+# New server folder 'server/foo' created.
+# Server folder 'server/foo' was assigned.

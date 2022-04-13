@@ -1,6 +1,4 @@
-from re import L
 import socket
-import sys
 from urllib.parse import urlparse
 import json
 
@@ -17,6 +15,7 @@ import json
 #   --> Parses html file, finds more objects --> REQUEST AGAIN
 
 OUTPUTS_DIR = './outputs/'
+DEFAULT_USER_AGENT = 'Concordia-HTTP/1.0'
 
 class HttpcRequests:
 
@@ -43,8 +42,6 @@ class HttpcRequests:
 
 
     def create_request_headers(self):
-        DEFAULT_USER_AGENT = 'Concordia-HTTP/1.0'
-
         # add host entry to the headers dict
         if not self.headers:
             self.headers = dict()
@@ -53,9 +50,6 @@ class HttpcRequests:
         # if User-Agent header does not exist (user did not specified in httpc command line with -h)
         if 'User-Agent' not in self.headers:
             self.headers['User-Agent'] = DEFAULT_USER_AGENT # then append default user-agent
-            
-        if self.body:
-            self.headers['Content-Length'] = str(len(self.body))
 
         ''' self.headers['Connection'] = 'closed' '''
 
@@ -72,6 +66,9 @@ class HttpcRequests:
                 self.body=json.dumps(json_data)
         if self.post_inline_data:
             self.body = str(self.post_inline_data)
+        if 'Content-Length' in self.headers:
+            index = int(self.headers['Content-Length'])
+            self.body = self.body[:index]
         return self.body
         
     
@@ -94,10 +91,10 @@ class HttpcRequests:
             # connect to the server(host) at port num given
             client_socket.connect((self.hostname, self.port))
             # send request message to server
-            client_socket.sendall(self.request_message.encode("UTF-8"))
+            client_socket.sendall(self.request_message.encode("utf-8"))
             # receive response data from server
             # MSG_WAITALL waits for full request or error
-            response = client_socket.recv(4096, socket.MSG_WAITALL).decode("utf-8")
+            response = client_socket.recv(4096).decode()
             # Divide response into header (verbose) and body
             response_header = response[:response.find('\r\n\r\n')].replace('\r\n\r\n', '')
             response_body = response[response.find('\r\n\r\n'):].replace('\r\n\r\n', '')
@@ -106,13 +103,14 @@ class HttpcRequests:
             print("[Replied]")
             if self.verbose:
                 print(response_header)
-            print('\n\n')
+                print('\n')
             if self.output_file:
                 self.output_to_file(response_body)
-                print(">>> The response was written in {}".format(self.output_file))
+                print(">>> The response is recorded in {}".format(self.output_file))
             else:
                 print(response_body)
-
+        except:
+            print("!!! Client Connection Failed")
         finally:
             # close the connection
             client_socket.close()
@@ -143,10 +141,10 @@ class HttpcRequests:
         request_uri = "{}?{}".format(self.path, self.query) if self.query else self.path
         # Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         request_line = "POST {} HTTP/1.0\r\n".format(request_uri)
-        # Request-Body
-        request_body = self.create_request_body()
         # Request-Heaer = Headers CRLF User-Agent CRLF
         request_headers = self.create_request_headers()
+        # Request-Body
+        request_body = self.create_request_body()
 
         self.request_message = "{}{}\r\n{}\r\n".format(request_line, request_headers, request_body)
 
@@ -155,6 +153,7 @@ class HttpcRequests:
 
         self.run_client()
         #return self.request_message
+
 
 
 if __name__ == "__main__":

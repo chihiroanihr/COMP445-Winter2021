@@ -32,8 +32,7 @@ class HTTPC:
 
     def convert_headers_to_dict(self):
         self.headers = [header.split(':') for header in self.headers]
-        self.headers = {header[0]:header[1] for header in self.headers}
-        
+        self.headers = {header[0].strip():header[1].strip() for header in self.headers}
         
     def file_is_valid(self, file):
         try:
@@ -156,7 +155,7 @@ if __name__ == '__main__':
 # python3 httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1' -o output.txt
 
 ''' post: header '''
-# python3 httpc.py post -h Content-Type:application/json http://httpbin.org/post
+# python3 httpc.py post http://httpbin.org/post -h Content-Type:application/json
 #   ---> reply content is null (0)
 ''' post: header, inline-data '''
 # python3 httpc.py post -h Content-Type:application/json -d '{"Assignment": 1}' http://httpbin.org/post

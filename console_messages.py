@@ -1,5 +1,5 @@
 class HttpcManuals:
-
+    
     LOGO = '''
      _     _   _              
     | |__ | |_| |_ _ __   ___ 
@@ -16,7 +16,7 @@ class HttpcManuals:
     "
 
     HELP = "httpc is a curl-like application but supports HTTP protocols only. \
-    \nUsage: \
+    \n\nUsage: \
     \n    httpc command [arguments] \
     \nThe commands are: \
     \n    get\texecutes a HTTP GET request and prints the response. \
@@ -35,14 +35,16 @@ class HttpcManuals:
     POST_HELP = "Post executes a HTTP POST request for a given URL with inline data or form file."
     POST_EPILOG = "Either [-d] or [-f] can be used but not both."
 
-    GET_HELP_CUSTOM = "Usage: httpc get [-v] [-h key:value] URL [-o output-file] FILENAME \
+    GET_HELP_CUSTOM = "\
+    \nUsage: httpc get [-v] [-h key:value] URL [-o output-file] FILENAME \
     \n \
     \nGet executes a HTTP GET reqeust for a given URL. \
     \n  -v              {} \
     \n  -h key:value    {} \
     ".format(V_HELP, H_HELP)
 
-    POST_HELP_CUSTOM = "Usage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL [-o output-file] FILENAME\
+    POST_HELP_CUSTOM = "\
+    \nUsage: httpc post [-v] [-h key:value] [-d inline-data] [-f file] URL [-o output-file] FILENAME\
     \n \
     \nPost executes a HTTP POST request for a given URL with inline data or form file. \
     \n  -v              {} \

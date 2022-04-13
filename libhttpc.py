@@ -1,3 +1,4 @@
+from re import L
 import socket
 import sys
 from urllib.parse import urlparse
@@ -15,9 +16,11 @@ import json
 # 3. HTTP client receives response message containing html file, displays html. 
 #   --> Parses html file, finds more objects --> REQUEST AGAIN
 
+OUTPUTS_DIR = './outputs/'
+
 class HttpcRequests:
 
-    def __init__(self, url, headers='', inline_body='', file='', verbose=False, output_file='', DEFAULT_PORT=80): # Standard HTTP/TCP port is 80
+    def __init__(self, url, headers='', post_inline_data='', post_input_file='', verbose=False, output_file='', DEFAULT_PORT=80): # Standard HTTP/TCP port is 80
         self.request_method = None  # To initialize request method: GET / POST
         self.request_message = ''   # To send full request lines to the host
         self.parsed_url = urlparse(url) # Parse URL
@@ -27,9 +30,9 @@ class HttpcRequests:
         self.port = self.parsed_url.port if self.parsed_url.port else DEFAULT_PORT
         self.query = self.parsed_url.query  # in string
         self.headers = headers  # in dict {'key':'val'}
-        self.inline_body = inline_body
-        self.file = file
         self.verbose = verbose
+        self.post_inline_data = post_inline_data # in json
+        self.post_input_file = post_input_file # in json
         self.body = ''
         self.output_file = output_file
 
@@ -63,26 +66,22 @@ class HttpcRequests:
 
     
     def create_request_body(self):
-        if self.file:
-            with open(self.file, encoding='utf-8') as json_file:
+        if self.post_input_file:
+            with open(self.post_input_file, encoding='utf-8') as json_file:
                 json_data = json.load(json_file)
                 self.body=json.dumps(json_data)
-        if self.inline_body:
-            self.body = str(self.inline_body)
+        if self.post_inline_data:
+            self.body = str(self.post_inline_data)
         return self.body
-        #return request_body_str
-        #return self.inline_body
         
     
     def output_to_file(self, response):
-        OUTPUTS_DIR = './outputs/'
         self.output_file = OUTPUTS_DIR + self.output_file
         try:
             f = open(self.output_file, "w")
-            print("The response was written in the {} file.".format(self.output_file))
             f.write(response)
         except:
-            print("The error occured while outputting to file.")
+            print("!!! The error occured while outputting to file.")
             print(response)
         finally:
             f.close()
@@ -99,16 +98,20 @@ class HttpcRequests:
             # receive response data from server
             # MSG_WAITALL waits for full request or error
             response = client_socket.recv(4096, socket.MSG_WAITALL).decode("utf-8")
+            # Divide response into header (verbose) and body
+            response_header = response[:response.find('\r\n\r\n')].replace('\r\n\r\n', '')
+            response_body = response[response.find('\r\n\r\n'):].replace('\r\n\r\n', '')
 
-            # if no verbose, remove all the response headers (until CRLF)
-            if not self.verbose:
-                response = response[response.find('\r\n\r\n'):].replace('\r\n\r\n', '')
-            
+            # Output response message
+            print("[Replied]")
+            if self.verbose:
+                print(response_header)
+            print('\n\n')
             if self.output_file:
-                self.output_to_file(response)
+                self.output_to_file(response_body)
+                print(">>> The response was written in {}".format(self.output_file))
             else:
-                print("[Replied]")
-                sys.stdout.write(response)
+                print(response_body)
 
         finally:
             # close the connection
@@ -145,7 +148,7 @@ class HttpcRequests:
         # Request-Heaer = Headers CRLF User-Agent CRLF
         request_headers = self.create_request_headers()
 
-        self.request_message = "{}{}\r\n{}\r\n\r\n".format(request_line, request_headers, request_body)
+        self.request_message = "{}{}\r\n{}\r\n".format(request_line, request_headers, request_body)
 
         print("[Sent]")
         print(self.request_message)
@@ -180,17 +183,17 @@ if __name__ == "__main__":
     url = 'http://httpbin.org/post'
     data = {'Assignment': 1}
     headers = {"Content-Type":"application/json"}
-    request = HttpcRequests(url, headers=headers, inline_body=data)
+    request = HttpcRequests(url, headers=headers, post_inline_data=data)
     request.POST()
     
     print("========= 6th Request =========")
     url = 'http://httpbin.org/post'    
     headers = {"Content-Type":"application/json"}
-    request = HttpcRequests(url=url, headers=headers, file='file1.json')
+    request = HttpcRequests(url=url, headers=headers, post_input_file='file1.json')
     request.POST()
     
     print("========= 7th Request =========")
     url = 'http://httpbin.org/post'    
     headers = {"Content-Type":"application/json"}
-    request = HttpcRequests(url=url, headers=headers, file='file1.json', output_file='result.txt')
+    request = HttpcRequests(url=url, headers=headers, post_input_file='file1.json', output_file='result.txt')
     request.POST()

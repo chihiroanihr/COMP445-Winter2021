@@ -1,0 +1,15 @@
+20:08:32.238667 config: drop-rate=0.20, max-delay=10ms, seed=1
+20:08:32.242338 router is listening at :3000
+20:08:50.439451 [queue=1] packet #1, 127.0.0.1:50732 -> 127.0.0.1:8007, sz=11 is delayed for 8.7ms
+20:08:50.461936 [queue=0] packet #1, 127.0.0.1:50732 -> 127.0.0.1:8007, sz=11 is delivered
+20:08:50.463484 [queue=1] packet #1, 127.0.0.1:8007 -> 127.0.0.1:50732, sz=11 is delayed for 5.9ms
+20:08:50.477172 [queue=0] packet #1, 127.0.0.1:8007 -> 127.0.0.1:50732, sz=11 is delivered
+20:17:50.924189 [queue=1] packet #1, 127.0.0.1:65092 -> 127.0.0.1:8007, sz=11 is delayed for 1.8ms
+20:17:50.926396 [queue=0] packet #1, 127.0.0.1:65092 -> 127.0.0.1:8007, sz=11 is delivered
+20:17:50.927581 [queue=0] packet #1, 127.0.0.1:8007 -> 127.0.0.1:65092, sz=11 is dropped
+00:36:14.488910 [queue=0] packet #1, 127.0.0.1:59180 -> 127.0.0.1:8007, sz=11 is dropped
+00:36:23.847192 [queue=0] packet #1, 127.0.0.1:61532 -> 127.0.0.1:8007, sz=11 is dropped
+00:36:31.553707 [queue=1] packet #1, 127.0.0.1:61533 -> 127.0.0.1:8007, sz=11 is delayed for 9.4ms
+00:36:31.579777 [queue=0] packet #1, 127.0.0.1:61533 -> 127.0.0.1:8007, sz=11 is delivered
+00:36:31.588663 [queue=1] packet #1, 127.0.0.1:8007 -> 127.0.0.1:61533, sz=11 is delayed for 6.2ms
+00:36:31.609320 [queue=0] packet #1, 127.0.0.1:8007 -> 127.0.0.1:61533, sz=11 is delivered

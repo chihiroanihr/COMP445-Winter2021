@@ -15,10 +15,6 @@ def run_server(server_port=DEFAULT_SERVER_PORT, server_dir='', verbose=True):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     try:
-        server_socket.bind(('', server_port))
-        print(
-            f"\n\n* * * * * * Server is listening at {server_port} * * * * * *")
-
         # Create or Assign Server Directory
         # if custom directory chosen then create new directory inside the global server folder
         if server_dir:
@@ -35,6 +31,11 @@ def run_server(server_port=DEFAULT_SERVER_PORT, server_dir='', verbose=True):
             print(
                 f">>> Default server folder: {server_dir} was assigned." if verbose else '')
 
+        # start the server socket
+        server_socket.bind(('', server_port))
+        print(
+            f"\n\n* * * * * * Server is listening at {server_port} * * * * * *")
+
         while True:
             # Server receives packet with the carrier address (router address)
             packet, sender_addr = server_socket.recvfrom(1024)
@@ -47,6 +48,9 @@ def run_server(server_port=DEFAULT_SERVER_PORT, server_dir='', verbose=True):
                 server_dir,
                 verbose
             )
+
+    except KeyboardInterrupt:
+        print("* * * * * * Session Finished with ctrl-C * * * * * *")
 
     finally:
         server_socket.close()
@@ -76,10 +80,10 @@ def handle_client(server_socket, packet, sender_addr, server_dir, verbose):
         print("Payload Queries: \n{}"
               .format(
                   shell_boxing(
-                      f"headers: {headers}\r\n" + \
-                      f"body: {body}\r\n" + \
-                      f"request method: {request_method}\r\n" + \
-                      f"request path: {request_path}\r\n" + \
+                      f"headers: {headers}\r\n" +
+                      f"body: {body}\r\n" +
+                      f"request method: {request_method}\r\n" +
+                      f"request path: {request_path}\r\n" +
                       f"protocol version: {protocol_ver}",
                       output_queries=True
                   )
@@ -88,9 +92,9 @@ def handle_client(server_socket, packet, sender_addr, server_dir, verbose):
               )
 
         # create respone message
-        print(">>> Creating response message" if verbose else '')
-        response_msg = create_response_msg(
-            headers, body, request_method, request_path, protocol_ver, server_dir, verbose
+        print(">>> Performing request and Creating response message" if verbose else '')
+        response_msg = perform_request(
+            headers, body, request_method, request_path, protocol_ver, server_dir
         )
 
         # # create response packet via storing the response message to packet
@@ -137,9 +141,8 @@ def parse_request(http_request_msg):
     return headers, body, request_method, request_path, protocol_ver
 
 
-def create_response_msg(headers, post_body_message, request_method, request_path, protocol_ver, server_dir, verbose):
+def perform_request(headers, post_body_message, request_method, request_path, protocol_ver, server_dir):
     # initialize variables
-    response = ''
     response_body = ''
     status_code = 200
     content_type = ''
@@ -159,7 +162,6 @@ def create_response_msg(headers, post_body_message, request_method, request_path
         # 1. GET / or GET /folder
         if request_path == '/' or os.path.isdir(request_abs_path):
             files = os.listdir(request_abs_path)
-            print(files)
             content_type = 'text/plain'
             response_body = '\n'.join(files) if len(files) > 0 \
                 else f"\n{status_code}\nNo files have found in this directory '{server_dir}'"
@@ -216,6 +218,17 @@ def create_response_msg(headers, post_body_message, request_method, request_path
             if 'Content-Type' in header:
                 content_type = header.replace('Content-Type:', '').strip()
 
+    # create response message based on the info retrieved
+    response = create_response_message(
+        protocol_ver, status_code, connection, content_length, content_type, response_body)
+
+    return response
+
+
+def create_response_message(protocol_ver, status_code, connection, content_length, content_type='', response_body=''):
+    response = ''
+
+    # create response message
     response += f"{protocol_ver} {status_code} {STATUS_MESSAGE[status_code]['message']}\r\n"
     response += f"Date: {DATE}\r\n"
     response += f"Content-Type: {content_type}\r\n" if content_type else ''
@@ -227,5 +240,5 @@ def create_response_msg(headers, post_body_message, request_method, request_path
 
 
 if __name__ == "__main__":
-    # run_server(port=8007)
-    run_server(server_port=8010)
+    run_server(server_port=8007)
+    # run_server(server_port=8010)

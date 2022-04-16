@@ -2,6 +2,7 @@ import json
 import socket
 import ipaddress
 from urllib.parse import urlparse
+from global_config import MAX_PAYLOAD_SIZE, MAX_SEQ_NUM
 from packet import Packet
 from utils.shell_output import shell_boxing
 from utils.global_config import (
@@ -59,28 +60,28 @@ class HttpcRequests:
         self.server_port = server_port
         # peer address = receiver's address (server) for sending packet
         self.peer_ip_addr = ipaddress.ip_address(
-            socket.gethostbyname(self.server_host))
+            socket.gethostbyname(self.server_host)
+        )
         self.packet_status = None
 
-        #self.scheme = self.parsed_url.scheme
-        #self.netloc = self.parsed_url.netloc
-        #self.params = self.parsed_url.params
-        #self.fragment = self.parsed_url.fragment
-
     def request(self, request_method):
+        self.request_method = request_method
+
         # Request-URI = [ path ][ "?" query ]
         request_uri = f"{self.path}?{self.query}" if self.query else self.path
-        # Request-Line = Method SP Request-URI SP HTTP-Version CRLF
-        request_line = f"GET {request_uri} HTTP/1.0\r\n"
         # Request-Heaer = Headers CRLF User-Agent CRLF
         request_headers = self.create_request_headers()
 
         # if get method, then send only header message
-        if request_method == RequestMethod.GET:
+        if self.request_method == RequestMethod.GET:
+            # Request-Line = Method Request-URI HTTP-Version CRLF
+            request_line = f"GET {request_uri} HTTP/1.0\r\n"
             send_payload = f"{request_line}{request_headers}\r\n"
 
         # if post method, then send both header and body
-        if request_method == RequestMethod.POST:
+        if self.request_method == RequestMethod.POST:
+            # Request-Line = Method Request-URI HTTP-Version CRLF
+            request_line = f"POST {request_uri} HTTP/1.0\r\n"
             # Request-Body
             request_body = self.create_request_body()
             send_payload = f"{request_line}{request_headers}\r\n{request_body}\r\n"
@@ -122,16 +123,13 @@ class HttpcRequests:
             client_socket.sendto(
                 send_byte_packet, (self.router_host, self.router_port)
             )
-            print(">>> Successfully sent." if self.verbose else '')
+            print(">>> Successfully sent.")
 
             # receive response packet from router
             print("\n.....waiting for a response.....\n")
             receive_byte_packet, sender_addr = client_socket.recvfrom(1024)
             self.packet_status = PacketStatus.RECEIVED
-            print(
-                ">>> Successfully received a response from server via router."
-                if self.verbose else ''
-            )
+            print(">>> Successfully received a response from server via router.")
 
             # Convert from network-byte(big-endian order) to host-byte after receiving packet
             receive_packet = Packet.from_bytes(receive_byte_packet)
@@ -172,19 +170,23 @@ class HttpcRequests:
 
             # Output response
             output_str = ''
-            output_str += f"Router: {sender_addr}" + \
-                f"Packet: {packet}" + \
-                f"Packet total size: {packet_total_size}" + \
-                f"(header size={header_size}, body size={body_size})" \
+            output_str += f"Router: {sender_addr}\n" + \
+                f"Packet: {packet}\n" + \
+                f"Packet total size: {packet_total_size}\n" + \
+                f"(header size={header_size}, body size={body_size})\n" \
                 if self.verbose else ''
-
-            output_str += "Payload: \n"
-            if self.output_file:
-                output_str += f"{shell_boxing(payload_header) if self.verbose else ''}" + \
-                    f"\nThe response message payload received was recorded in {self.output_file}"
-            else:
-                output_str += f"{shell_boxing(payload_header+payload_body)}" if self.verbose \
-                    else f"{shell_boxing(payload_body) if payload_body.strip() else ''}"
+            
+            if self.request_method == RequestMethod.GET:
+                output_str += "Payload: \n"
+                if self.output_file:
+                    output_str += f"{shell_boxing(payload_header) if self.verbose else ''}" + \
+                        f"\nThe response message payload received was recorded in {self.output_file}"
+                else:
+                    output_str += f"{shell_boxing(payload_header+payload_body)}" if self.verbose \
+                        else f"{shell_boxing(payload_body) if payload_body.strip() else ''}"
+            
+            if self.request_method == RequestMethod.POST:
+                output_str += f">>> Post request message/payload was successfully stored."
 
             print(output_str)
 

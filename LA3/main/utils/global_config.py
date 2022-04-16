@@ -14,11 +14,11 @@ GLOBAL_SERVER_DIR = '../server'
 
 # default router host and port to be used for listening incoming packets
 DEFAULT_ROUTER_HOST = 'localhost'
-DEFAULT_ROUTER_PORT = 3010
+DEFAULT_ROUTER_PORT = 3000
 
 # default server host and port to be used for listening incoming packets
 DEFAULT_SERVER_HOST = 'localhost'
-DEFAULT_SERVER_PORT = 8010
+DEFAULT_SERVER_PORT = 8007
 
 # connection timeout
 CONN_TIMEOUT = 5

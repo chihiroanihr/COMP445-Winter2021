@@ -67,7 +67,6 @@ class HttpcRequests:
         #self.params = self.parsed_url.params
         #self.fragment = self.parsed_url.fragment
 
-
     def request(self, request_method):
         # Request-URI = [ path ][ "?" query ]
         request_uri = f"{self.path}?{self.query}" if self.query else self.path
@@ -87,7 +86,6 @@ class HttpcRequests:
             send_payload = f"{request_line}{request_headers}\r\n{request_body}\r\n"
 
         self.run_client(send_payload)
-
 
     def run_client(self, send_payload):
         # open and set up client socket
@@ -133,7 +131,7 @@ class HttpcRequests:
             print(
                 ">>> Successfully received a response from server via router."
                 if self.verbose else ''
-                )
+            )
 
             # Convert from network-byte(big-endian order) to host-byte after receiving packet
             receive_packet = Packet.from_bytes(receive_byte_packet)
@@ -153,48 +151,42 @@ class HttpcRequests:
             # close the connection
             client_socket.close()
 
-
     def output_packet(self, packet, byte_packet, payload, sender_addr=''):
-        if self.verbose:
-            packet_total_size = len(byte_packet)
-            header_size = len(byte_packet)-len(payload)
-            body_size = len(payload)
+        packet_total_size = len(byte_packet)
+        header_size = len(byte_packet)-len(payload)
+        body_size = len(payload)
 
-            # console output for sending packet data
-            if self.packet_status == PacketStatus.CREATED:
-                print(f"Packet: {packet}")
-                print(f"Packet total size: {packet_total_size}" + \
-                      f"(header size={header_size}, body size={body_size})"
-                    )
-                print(f"Payload: \n{shell_boxing(payload)}")
+        # console output for sending packet data
+        if self.packet_status == PacketStatus.CREATED and self.verbose:
+            print(f"Packet: {packet}")
+            print(f"Packet total size: {packet_total_size}" +
+                  f"(header size={header_size}, body size={body_size})"
+                  )
+            print(f"Payload: \n{shell_boxing(payload)}")
 
-            # console output for response packet data
-            elif self.packet_status == PacketStatus.RECEIVED:
-                # Divide response message into header (if verbose) and body
-                payload_header = payload[:payload.find('\r\n\r\n')]
-                payload_body = payload[payload.find('\r\n\r\n'):]
+        # console output for response packet data
+        elif self.packet_status == PacketStatus.RECEIVED:
+            # Divide response message into header (if verbose) and body
+            payload_header = payload[:payload.find('\r\n\r\n')]
+            payload_body = payload[payload.find('\r\n\r\n'):]
 
-                # Output response
-                print('Router: ', sender_addr)
-                print('Packet: ', packet)
-                print(f"Packet total size: {packet_total_size} " + \
-                      f"(header size={header_size}, body size={body_size})"
-                    )
-                print('Payload: ')
-                output_str = ''
-                if self.verbose:
-                    output_str += payload_header
-                if self.output_file:
-                    self.output_to_file(payload_body)
-                    print("The response message payload received was recorded in " + \
-                          f"{self.output_file}"
-                        )
-                else:
-                    output_str += '\r\n' + payload_body
-                print(shell_boxing(output_str))
-        else:
-            return
+            # Output response
+            output_str = ''
+            output_str += f"Router: {sender_addr}" + \
+                f"Packet: {packet}" + \
+                f"Packet total size: {packet_total_size}" + \
+                f"(header size={header_size}, body size={body_size})" \
+                if self.verbose else ''
 
+            output_str += "Payload: \n"
+            if self.output_file:
+                output_str += f"{shell_boxing(payload_header) if self.verbose else ''}" + \
+                    f"\nThe response message payload received was recorded in {self.output_file}"
+            else:
+                output_str += f"{shell_boxing(payload_header+payload_body)}" if self.verbose \
+                    else f"{shell_boxing(payload_body) if payload_body.strip() else ''}"
+
+            print(output_str)
 
     def output_to_file(self, body):
         self.output_file = OUTPUTS_DIR + self.output_file
@@ -206,7 +198,6 @@ class HttpcRequests:
             print(shell_boxing(body))
         finally:
             file.close()
-
 
     def create_request_headers(self):
         # add host entry to the headers dict
@@ -226,7 +217,6 @@ class HttpcRequests:
             request_header_str += f"{key}:{val}\r\n"
         return request_header_str
 
-
     def create_request_body(self):
         body = ''
         if self.post_input_file:
@@ -239,7 +229,6 @@ class HttpcRequests:
             index = int(self.request_header['Content-Length'])
             body = body[:index]
         return body
-
 
 
 if __name__ == "__main__":

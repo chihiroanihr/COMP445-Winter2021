@@ -1,9 +1,9 @@
 import argparse
 from argparse import RawTextHelpFormatter as rtf
 import sys
+from libhttpc import HttpcRequests
 from utils.global_config import RequestMethod, INPUTS_DIR
 from utils.console_messages import HttpcManuals
-from libhttpc import HttpcRequests
 
 #print(HttpcManuals.LOGO)
 #print(HttpcManuals.WELCOME)

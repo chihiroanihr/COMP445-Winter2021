@@ -90,7 +90,8 @@ def handle_client(server_socket, packet, sender_addr, server_dir, verbose):
         # create respone message
         print(">>> Creating response message" if verbose else '')
         response_msg = create_response_msg(
-            headers, body, request_method, request_path, protocol_ver, server_dir, verbose)
+            headers, body, request_method, request_path, protocol_ver, server_dir, verbose
+        )
 
         # # create response packet via storing the response message to packet
         print(">>> Creating response packet" if verbose else '')
@@ -158,12 +159,13 @@ def create_response_msg(headers, post_body_message, request_method, request_path
         # 1. GET / or GET /folder
         if request_path == '/' or os.path.isdir(request_abs_path):
             files = os.listdir(request_abs_path)
+            print(files)
             content_type = 'text/plain'
             response_body = '\n'.join(files) if len(files) > 0 \
                 else f"\n{status_code}\nNo files have found in this directory '{server_dir}'"
         # 2. GET /filename
         elif os.path.isfile(request_abs_path):
-            with open(request_abs_path, 'r', encoding='uft-8') as file:
+            with open(request_abs_path, 'r', encoding='utf-8') as file:
                 content_type = 'text/plain'
                 response_body += file.read()
         # INVALID: PATH DOES NOT EXIST

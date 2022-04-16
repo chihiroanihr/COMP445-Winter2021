@@ -1,27 +1,27 @@
 ######## httpfs.py commands ########
 default
-    python3 httpfs.py
+    python httpfs.py
 
 [output]
 * * * * * Server is listening at 8007 * * * * *
 
 verbose
-    python3 httpfs.py -v
+    python httpfs.py -v
 
 [output]
 * * * * * Server is listening at 8007 * * * * *
 Default server folder: 'server/default' was assigned.
 
 verbose, port number
-    python3 httpfs.py -v -p 8070
+    python httpfs.py -v -p 8070
 
 [output]
 * * * * * Server is listening at 8007 * * * * *
 Default server folder: 'server/default' was assigned.
 
 server folder
-    python3 httpfs.py -d foo
-    python3 httpfs.py -d /foo
+    python httpfs.py -d foo
+    python httpfs.py -d /foo
 
 [output]
 * * * * * Server is listening at 8007 * * * * *
@@ -33,77 +33,77 @@ Server folder 'server/foo' was assigned.
 ######## httpc.py file access request commands ########
 
 get: /, verbose
-    python3 httpc.py get https://localhost:8007/ -v
+    python httpc.py get https://localhost:8007/ -v
 get: /filename
-    python3 httpc.py get https://localhost:8007/file1.txt
+    python httpc.py get https://localhost:8007/file1.txt
 get: /foldername
-    python3 httpc.py get https://localhost:8007/folder2
-    python3 httpc.py get https://localhost:8007/../ -v
+    python httpc.py get https://localhost:8007/folder2
+    python httpc.py get https://localhost:8007/../ -v
     --> 403 Security Error
 get: /, verbose, header
-    python3 httpc.py get http://localhost:8007/ -v -h "key:value"  
-    python3 httpc.py get https://localhost:8007/ -v -h Content-Type:application/json
-    python3 httpc.py get https://localhost:8007/folder1 -v -h Content-Type:application/json
-    python3 httpc.py get https://localhost:8007/a.txt -v -h Content-Type:application/json
-    python3 httpc.py get https://localhost:8007/foo -v -h Content-Type:application/json
+    python httpc.py get http://localhost:8007/ -v -h "key:value"  
+    python httpc.py get https://localhost:8007/ -v -h Content-Type:application/json
+    python httpc.py get https://localhost:8007/folder1 -v -h Content-Type:application/json
+    python httpc.py get https://localhost:8007/a.txt -v -h Content-Type:application/json
+    python httpc.py get https://localhost:8007/foo -v -h Content-Type:application/json
     --> 404 File Not Found
 
 post: /, verbose
-    python3 httpc.py post https://localhost:8007/ -v
+    python httpc.py post https://localhost:8007/ -v
     --> 400 Bad Request since posting to folder
-    python3 httpc.py post https://localhost:8007/../../ -v
+    python httpc.py post https://localhost:8007/../../ -v
     --> 403 Security Error
 post: /foldername, verbose, header
-    python3 httpc.py post https://localhost:8007/folder1/file1.json -v -h Content-Type:application/json
-    python3 httpc.py post https://localhost:8007/folder1 -v -h Content-Type:application/json
+    python httpc.py post https://localhost:8007/folder1/file1.json -v -h Content-Type:application/json
+    python httpc.py post https://localhost:8007/folder1 -v -h Content-Type:application/json
     --> 400 Bad Request since posting to folder
 post: /filename, verbose, header, inline-data
-    python3 httpc.py post https://localhost:8007/folder1/file2.txt
-    python3 httpc.py post https://localhost:8007/folder1/file2.txt -d "hi, i am file2.txt"
-    python3 httpc.py post https://localhost:8007/folder1/file3.txt -h Content-Length:2 -d "hi, i am file3.txt"
-    python3 httpc.py post https://localhost:8007/folder1/file4.json -f file1.json
-    python3 httpc.py post https://localhost:8007/ -f file1.json -v
+    python httpc.py post https://localhost:8007/folder1/file2.txt
+    python httpc.py post https://localhost:8007/folder1/file2.txt -d "hi, i am file2.txt"
+    python httpc.py post https://localhost:8007/folder1/file3.txt -h Content-Length:2 -d "hi, i am file3.txt"
+    python httpc.py post https://localhost:8007/folder1/file4.json -f file1.json
+    python httpc.py post https://localhost:8007/ -f file1.json -v
     --> 400 Bad Request simce posting to folder
 
 
 
 ######## httpc.py regular http request commands ########
 help message
-    python3 httpc.py help / -h / --help
-    python3 httpc.py help get / python3 httpc.py get --help
-    python3 httpc.py help post / python3 httpc.py post --help
+    python httpc.py help / -h / --help
+    python httpc.py help get / python httpc.py get --help
+    python httpc.py help post / python httpc.py post --help
 
 error handling (check the unrecognized argument message)
-    python3 httpc.py adfdasfdasf help
-    python3 httpc.py adfadsfdsaf
-    python3 httpc.py 
+    python httpc.py adfdasfdasf help
+    python httpc.py adfadsfdsaf
+    python httpc.py 
     --> ERROR: following arg are required: 'command'
 
 get
-    python3 httpc.py get http://httpbin.org/status/418
-    python3 httpc.py get https://httpbin.org/get
-    python3 httpc.py get 'http://httpbin.org/get?course=networking&assignment=1'
+    python httpc.py get http://httpbin.org/status/418
+    python httpc.py get https://httpbin.org/get
+    python httpc.py get 'http://httpbin.org/get?course=networking&assignment=1'
 get: verbose
-    python3 httpc.py get http://httpbin.org/status/418 -v
-    python3 httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1'
+    python httpc.py get http://httpbin.org/status/418 -v
+    python httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1'
 get: header
-    python3 httpc.py get 'http://httpbin.org/get?course=networking&assignment=1' -h 'key:value'
+    python httpc.py get 'http://httpbin.org/get?course=networking&assignment=1' -h 'key:value'
 get: header, verbose
-    python3 httpc.py get 'http://httpbin.org/get?course=networking&assignment=1' -h 'key:value' -v
+    python httpc.py get 'http://httpbin.org/get?course=networking&assignment=1' -h 'key:value' -v
 get: verbose, multiple headers
-    python3 httpc.py get https://httpbin.org/get -v -h "Content-Type:application/json" "Cache-Control: max-age=0" "Connection: close"
-    python3 httpc.py get "http://httpbin.org/headers" -v -h "Accept-Language: en us,en;q=0.5" -h "Content-Type: application/json; charset=utf-8"
+    python httpc.py get https://httpbin.org/get -v -h "Content-Type:application/json" "Cache-Control: max-age=0" "Connection: close"
+    python httpc.py get "http://httpbin.org/headers" -v -h "Accept-Language: en us,en;q=0.5" -h "Content-Type: application/json; charset=utf-8"
 get: verbose, output
-    python3 httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1' -o output.txt
+    python httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1' -o output.txt
 
 post: header
-    python3 httpc.py post http://httpbin.org/post -h Content-Type:application/json
+    python httpc.py post http://httpbin.org/post -h Content-Type:application/json
     ---> reply content is null (0)
 post: header, inline-data
-    python3 httpc.py post -h Content-Type:application/json -d '{"Assignment": 1}' http://httpbin.org/post
+    python httpc.py post -h Content-Type:application/json -d '{"Assignment": 1}' http://httpbin.org/post
 post: verbose, multiple headers, inline-data
-    python3 httpc.py post -v -h "Content-Type:application/json" "Cache-Control: max-age=0" "Connection: close" -d "{"Assignemnt": 1, "Course": "Networking"}" "http://httpbin.org/post"
+    python httpc.py post -v -h "Content-Type:application/json" "Cache-Control: max-age=0" "Connection: close" -d "{"Assignemnt": 1, "Course": "Networking"}" "http://httpbin.org/post"
 post: verbose, multiple headers, file
-    python3 httpc.py post -v -h Content-Type:application/json -f file1.json  http://httpbin.org/post
+    python httpc.py post -v -h Content-Type:application/json -f file1.json  http://httpbin.org/post
 post: verbose, multiple headers, file, output
-    python3 httpc.py post -v -h Content-Type:application/json -f file1.json  http://httpbin.org/post -o file1.json
+    python httpc.py post -v -h Content-Type:application/json -f file1.json  http://httpbin.org/post -o file1.json

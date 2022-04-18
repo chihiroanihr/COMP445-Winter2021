@@ -36,6 +36,7 @@ get: /, verbose
     python httpc.py get https://localhost:8007/ -v
 get: /filename
     python httpc.py get https://localhost:8007/file1.txt
+    python httpc.py get -v https://localhost:8007/simple-html.html
 get: /foldername
     python httpc.py get https://localhost:8007/folder2
     python httpc.py get https://localhost:8007/../ -v

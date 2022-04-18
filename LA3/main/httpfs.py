@@ -1,6 +1,6 @@
 import argparse
 from argparse import RawTextHelpFormatter as rtf
-from libhttpfs import run_server
+from libhttpfs import HttpfsRequests
 from utils.console_messages import HttpfsManuals
 from utils.global_config import DEFAULT_SERVER_PORT
 
@@ -42,8 +42,9 @@ class HTTPFS:
         self.verbose = args.verbose
         self.port = args.port
         self.directory = args.directory
-
-        run_server(self.port, self.directory, self.verbose)
+        
+        server = HttpfsRequests(self.port, self.directory, self.verbose)
+        server.run_server()
 
 
 if __name__ == '__main__':

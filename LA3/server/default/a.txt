@@ -1,1 +1,1 @@
-adfd
+{key:value}

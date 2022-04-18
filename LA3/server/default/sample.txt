@@ -1,0 +1,28 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title> SOEN287 Course Website </title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+    
+    <div id="main_container">
+
+        <div id="header"> </div>
+        <div class="logo">
+            <b>SOEN287 Web Programming </b><span class="blue"> Course Site </span>
+        </div>
+
+
+        <div id="center_content">
+
+            <div class="intro">
+                <h1>Course Coverage</h1>
+                <p>
+                    This course aims to provide students with basic knowlege and skills of Web programming, it covers
+                    the following topics: <br /><br />
+                    After learning this course, students are anticipated to gain basic knowledge on web site
+                    developmen

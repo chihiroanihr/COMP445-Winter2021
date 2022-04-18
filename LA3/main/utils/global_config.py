@@ -21,7 +21,7 @@ DEFAULT_SERVER_HOST = 'localhost'
 DEFAULT_SERVER_PORT = 8007
 
 # connection timeout
-CONN_TIMEOUT = 5
+CONN_TIMEOUT = 2
 
 # headers: default user agent (for console output)
 # html body response depends on the user agent
@@ -75,3 +75,15 @@ class PacketType(IntEnum):
 
 class PacketStatus(IntEnum):
     CREATED, SENT, RECEIVED = range(0, 3)
+
+
+MAX_SEQ_NUM = 9
+MAX_PAYLOAD_SIZE = 1013
+MAX_WINDOW_SIZE = 4
+MAX_BUFFER_SIZE = 10
+
+# MAX_SEQ_NUM >= MAX_WINDOW_SIZE
+# MAX_BUFFER_SIZZE >= MAX_WINDOW_SIZE
+
+# Sender’s Windows ( Ws) = Receiver’s Windows ( Wr)
+# Window size should be less than or equal to half the sequence number in SR protocol.
